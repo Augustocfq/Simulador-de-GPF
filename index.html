@@ -1,104 +1,103 @@
 <!DOCTYPE html>
 <html lang="en">
-	<head>
-		<meta charset="UTF-8" />
-		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<title>Flexbox Layout</title>
-		<link rel="stylesheet" href="style.css" />
-	</head>
-	<body>
-		<div class="left">
-			<div class="inputs">
-				<div class="table-wrapper">
-					<h3>Registradores Seletores de Segmento</h3>
-					<table class="reg-table">
-						<tbody>
-							<tr>
-								<td>CS</td>
-								<td>A000</td>
-							</tr>
-							<tr>
-								<td>SS</td>
-								<td>B000</td>
-							</tr>
-							<tr>
-								<td>DS</td>
-								<td>C000</td>
-							</tr>
-							<tr>
-								<td>ES</td>
-								<td>D000</td>
-							</tr>
-						</tbody>
-					</table>
-				</div>
-				<div class="table-wrapper">
-					<h3>Registradores de Offset</h3>
-					<table class="reg-table">
-						<tbody>
-							<tr>
-								<td>IP</td>
-								<td><input type="text" name="ip" /></td>
-							</tr>
-							<tr>
-								<td>SP</td>
-								<td><input type="text" name="sp" /></td>
-							</tr>
-							<tr>
-								<td>BP</td>
-								<td><input type="text" name="bp" /></td>
-							</tr>
-							<tr>
-								<td>DI</td>
-								<td><input type="text" name="di" /></td>
-							</tr>
-							<tr>
-								<td>SI</td>
-								<td><input type="text" name="si" /></td>
-							</tr>
-						</tbody>
-					</table>
-				</div>
-			</div>
-			<div class="logs">
-				<h3>Logs:</h3>
-				<div class="terminal" id="log-output"></div>
-			</div>
-		</div>
-        <div class="right">
-            <div class="memory">
-                <div class="segment" data-name="CS" data-start="A000" data-end="B000">
-                    <div class="content">CS</div>
-                    <div class="labels">
-                        <div class="label end">DFFF</div>
-                        <div class="label start">D000</div>
-                    </div>
-                </div>
-                <div class="segment" data-name="SS" data-start="B000" data-end="C000">
-                    <div class="content">DS</div>
-                    <div class="labels">
-                        <div class="label end">CFFF</div>
-                        <div class="label start">C000</div>
-                    </div>
-                </div>
-                <div class="segment" data-name="DS" data-start="C000" data-end="D000">
-                    <div class="content">SS</div>
-                    <div class="labels">
-                        <div class="label end">BFFF</div>
-                        <div class="label start">B000</div>
-                    </div>
-                </div>
-                <div class="segment" data-name="ES" data-start="D000" data-end="E000">
-                    <div class="content">CS</div>
-                    <div class="labels">
-                        <div class="label end">AFFF</div>
-                        <div class="label start">A000</div>
-                    </div>
-                </div>
+   <head>
+      <meta charset="UTF-8" />
+      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <title>Flexbox Layout</title>
+      <link rel="stylesheet" href="style.css" />
+   </head>
+   <body>
+      <div class="left">
+         <div class="inputs">
+            <div class="table-wrapper">
+               <h3>Registradores Seletores de Segmento</h3>
+               <table class="reg-table">
+                  <tbody>
+                     <tr>
+                        <td>CS</td>
+                        <td id="reg-cs">A000</td>
+                     </tr>
+                     <tr>
+                        <td>SS</td>
+                        <td id="reg-ss">B000</td>
+                     </tr>
+                     <tr>
+                        <td>DS</td>
+                        <td id="reg-ds">C000</td>
+                     </tr>
+                     <tr>
+                        <td>ES</td>
+                        <td id="reg-es">D000</td>
+                     </tr>
+                  </tbody>
+               </table>
             </div>
-            <button class="simulate-btn" id="simulate-btn">Simular</button>
-        </div>
-	</body>
-    <script src="./script.js">
-    </script>
+            <div class="table-wrapper">
+               <h3>Registradores de Offset</h3>
+               <table class="reg-table">
+                  <tbody>
+                     <tr>
+                        <td>IP</td>
+                        <td><input type="text" name="ip" /></td>
+                     </tr>
+                     <tr>
+                        <td>SP</td>
+                        <td><input type="text" name="sp" /></td>
+                     </tr>
+                     <tr>
+                        <td>BP</td>
+                        <td><input type="text" name="bp" /></td>
+                     </tr>
+                     <tr>
+                        <td>DI</td>
+                        <td><input type="text" name="di" /></td>
+                     </tr>
+                     <tr>
+                        <td>SI</td>
+                        <td><input type="text" name="si" /></td>
+                     </tr>
+                  </tbody>
+               </table>
+            </div>
+         </div>
+         <div class="logs">
+            <h3>Logs:</h3>
+            <div class="terminal" id="log-output"></div>
+         </div>
+      </div>
+      <div class="right">
+         <div class="memory">
+            <div class="segment" data-name="CS">
+               <div class="content">ES</div>
+               <div class="labels">
+                  <div class="label end" id="reg-es-end">DFFF</div>
+                  <div class="label start" id="reg-es-mem">D000</div>
+               </div>
+            </div>
+            <div class="segment" data-name="SS">
+               <div class="content">DS</div>
+               <div class="labels">
+                  <div class="label end" id="reg-ds-end">CFFF</div>
+                  <div class="label start" id="reg-ds-mem">C000</div>
+               </div>
+            </div>
+            <div class="segment" data-name="DS">
+               <div class="content">SS</div>
+               <div class="labels">
+                  <div class="label end" id="reg-ss-end">BFFF</div>
+                  <div class="label start" id="reg-ss-mem">B000</div>
+               </div>
+            </div>
+            <div class="segment" data-name="ES">
+               <div class="content">CS</div>
+               <div class="labels">
+                  <div class="label end" id="reg-cs-end">AFFF</div>
+                  <div class="label start" id="reg-cs-mem">A000</div>
+               </div>
+            </div>
+         </div>
+         <button class="simulate-btn" id="simulate-btn">Simular</button>
+      </div>
+   </body>
+   <script src="./script.js"></script>
 </html>
