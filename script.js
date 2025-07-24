@@ -7,11 +7,11 @@ document.addEventListener("DOMContentLoaded", () => {
 document.getElementById("simulate-btn").addEventListener("click", () => {
    limpar_log();
    get_offsets();
-   print_log(O endereço físico de IP é: ${formatar_segmentos(CS + IP)});
-   print_log(O endereço físico de SP é: ${formatar_segmentos(SS + SP)});
-   print_log(O endereço físico de BP é: ${formatar_segmentos(SS + BP)});
-   print_log(O endereço físico de DI é: ${formatar_segmentos(DS + DI)});
-   print_log(O endereço físico de SI é: ${formatar_segmentos(DS + SI)});
+   print_log(`O endereço físico de IP é: ${formatar_segmentos(CS + IP)}`);
+   print_log(`O endereço físico de SP é: ${formatar_segmentos(SS + SP)}`);
+   print_log(`O endereço físico de BP é: ${formatar_segmentos(SS + BP)}`);
+   print_log(`O endereço físico de DI é: ${formatar_segmentos(DS + DI)}`);
+   print_log(`O endereço físico de SI é: ${formatar_segmentos(DS + SI)}`);
 });
 
 function definir_segmentos() {
