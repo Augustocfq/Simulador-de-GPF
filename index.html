@@ -66,36 +66,40 @@
          </div>
       </div>
       <div class="right">
-         <div class="memory">
-            <div class="segment" data-name="CS">
-               <div class="content">ES</div>
-               <div class="labels">
-                  <div class="label end" id="reg-es-end">DFFF</div>
-                  <div class="label start" id="reg-es-mem">D000</div>
-               </div>
-            </div>
-            <div class="segment" data-name="SS">
-               <div class="content">DS</div>
-               <div class="labels">
-                  <div class="label end" id="reg-ds-end">CFFF</div>
-                  <div class="label start" id="reg-ds-mem">C000</div>
-               </div>
-            </div>
-            <div class="segment" data-name="DS">
-               <div class="content">SS</div>
-               <div class="labels">
-                  <div class="label end" id="reg-ss-end">BFFF</div>
-                  <div class="label start" id="reg-ss-mem">B000</div>
-               </div>
-            </div>
-            <div class="segment" data-name="ES">
-               <div class="content">CS</div>
-               <div class="labels">
-                  <div class="label end" id="reg-cs-end">AFFF</div>
-                  <div class="label start" id="reg-cs-mem">A000</div>
-               </div>
+      <div class="memory">
+         <div class="segment" data-name="CS">
+            <div class="content">ES</div>
+            <div class="labels">
+               <div class="label end" id="reg-es-end">DFFF</div>
+               <div class="label size" id="reg-es-size">Tamanho: 4095</div>
+               <div class="label start" id="reg-es-mem">D000</div>
             </div>
          </div>
+         <div class="segment" data-name="SS">
+            <div class="content">DS</div>
+            <div class="labels">
+               <div class="label end" id="reg-ds-end">CFFF</div>
+               <div class="label size" id="reg-ds-size">Tamanho: 4095</div>
+               <div class="label start" id="reg-ds-mem">C000</div>
+            </div>
+         </div>
+         <div class="segment" data-name="DS">
+            <div class="content">SS</div>
+            <div class="labels">
+               <div class="label end" id="reg-ss-end">BFFF</div>
+               <div class="label size" id="reg-ss-size">Tamanho: 4095</div>
+               <div class="label start" id="reg-ss-mem">B000</div>
+            </div>
+         </div>
+         <div class="segment" data-name="ES">
+            <div class="content">CS</div>
+            <div class="labels">
+               <div class="label end" id="reg-cs-end">AFFF</div>
+               <div class="label size" id="reg-cs-size">Tamanho: 4095</div>
+               <div class="label start" id="reg-cs-mem">A000</div>
+            </div>
+         </div>
+      </div>
          <button class="simulate-btn" id="simulate-btn">Simular</button>
       </div>
    </body>

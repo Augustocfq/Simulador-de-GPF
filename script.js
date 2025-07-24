@@ -1,4 +1,4 @@
-let CS, SS, DS, ES, IP, SP, BP, DI, SI;
+let CS, SS, DS, ES, IP, SP, BP, DI, SI, tamCS, tamDS, tamES, tamSS;
 
 document.addEventListener("DOMContentLoaded", () => {
    definir_segmentos();
@@ -17,37 +17,60 @@ document.getElementById("simulate-btn").addEventListener("click", () => {
 });
 
 function definir_segmentos() {
-   CS = (Math.floor(Math.random() * 12) + 1) * 0x1000;
-   SS = CS + 0x1000;
-   DS = SS + 0x1000;
-   ES = DS + 0x1000;
+   function segmento_aleatorio_inicio(min = 0x1000, max = 0xF000) {
+      return Math.floor(Math.random() * ((max - min) / 0x10)) * 0x10 + min;
+   }
 
-   //atualizar inputs
+   function tamanho_aleatorio(min = 1, max = 0xFFFF) {
+      return Math.floor(Math.random() * (max - min + 1)) + min;
+   }
+
+   const tamanhos = {};
+   const inicios = {};
+
+   inicios.CS = segmento_aleatorio_inicio();
+   tamanhos.CS = tamanho_aleatorio();
+   tamCS = tamanhos.CS;
+
+   inicios.SS = inicios.CS + tamanhos.CS + 1;
+   tamanhos.SS = tamanho_aleatorio();
+   tamSS = tamanhos.SS;
+
+   inicios.DS = inicios.SS + tamanhos.SS + 1;
+   tamanhos.DS = tamanho_aleatorio();
+   tamDS = tamanhos.DS;
+
+   inicios.ES = inicios.DS + tamanhos.DS + 1;
+   tamanhos.ES = tamanho_aleatorio();
+   tamES = tamanhos.ES;
+
+   CS = inicios.CS;
+   SS = inicios.SS;
+   DS = inicios.DS;
+   ES = inicios.ES;
+
    document.getElementById("reg-cs").textContent = formatar_segmentos(CS);
    document.getElementById("reg-ss").textContent = formatar_segmentos(SS);
    document.getElementById("reg-ds").textContent = formatar_segmentos(DS);
    document.getElementById("reg-es").textContent = formatar_segmentos(ES);
 
-   //atualizar na memória inicio
    document.getElementById("reg-cs-mem").textContent = formatar_segmentos(CS);
    document.getElementById("reg-ss-mem").textContent = formatar_segmentos(SS);
    document.getElementById("reg-ds-mem").textContent = formatar_segmentos(DS);
    document.getElementById("reg-es-mem").textContent = formatar_segmentos(ES);
 
-   //atualizar na memória fim
-   document.getElementById("reg-cs-end").textContent = formatar_segmentos(
-      CS + 0xfff
-   );
-   document.getElementById("reg-ss-end").textContent = formatar_segmentos(
-      SS + 0xfff
-   );
-   document.getElementById("reg-ds-end").textContent = formatar_segmentos(
-      DS + 0xfff
-   );
-   document.getElementById("reg-es-end").textContent = formatar_segmentos(
-      ES + 0xfff
-   );
+   document.getElementById("reg-cs-end").textContent = formatar_segmentos(CS + tamanhos.CS);
+   document.getElementById("reg-ss-end").textContent = formatar_segmentos(SS + tamanhos.SS);
+   document.getElementById("reg-ds-end").textContent = formatar_segmentos(DS + tamanhos.DS);
+   document.getElementById("reg-es-end").textContent = formatar_segmentos(ES + tamanhos.ES);
+
+   // Atualizar tamanhos
+   document.getElementById("reg-cs-size").textContent = `${formatar_segmentos(tamanhos.CS)} Bytes`;
+   document.getElementById("reg-ss-size").textContent = `${formatar_segmentos(tamanhos.SS)} Bytes`;
+   document.getElementById("reg-ds-size").textContent = `${formatar_segmentos(tamanhos.DS)} Bytes`;
+   document.getElementById("reg-es-size").textContent = `${formatar_segmentos(tamanhos.ES)} Bytes`;
 }
+
 
 function formatar_segmentos(num) {
    return num.toString(16).toUpperCase();
@@ -79,68 +102,73 @@ function limpar_log() {
 function verificar_gpf() {
     const erros = [];
 
-    if (IP > 0xFFF || IP < 0) {
+    const limCS = CS + tamCS - 1;
+    const limDS = DS + tamDS - 1;
+    const limSS = SS + tamSS - 1;
+    const limES = ES + tamES - 1;
+
+    if (IP >= tamCS || IP < 0) {
         const fisico = CS + IP;
-        if (fisico >= SS && fisico <= SS + 0xFFF) {
-            erros.push(`ERRO: GPF de Código em Pilha (CS:SS), IP = ${IP}`);
-        } else if (fisico >= DS && fisico <= DS + 0xFFF) {
-            erros.push(`ERRO: GPF de Código em Dados (CS:DS), IP = ${IP}`);
-        } else if (fisico >= ES && fisico <= ES + 0xFFF) {
-            erros.push(`ERRO: GPF de Código em Dados (CS:ES), IP = ${IP}`);
+        if (fisico >= SS && fisico <= limSS) {
+            erros.push(`ERRO: GPF de Código em Pilha (CS:SS), Endereço físico: ${formatar_segmentos(fisico)}`);
+        } else if (fisico >= DS && fisico <= limDS) {
+            erros.push(`ERRO: GPF de Código em Dados (CS:DS), Endereço físico: ${formatar_segmentos(fisico)}`);
+        } else if (fisico >= ES && fisico <= limES) {
+            erros.push(`ERRO: GPF de Código em Dados (CS:ES), Endereço físico: ${formatar_segmentos(fisico)}`);
         } else {
-            erros.push(`ERRO: GPF de Código em Área Inválida (CS:?️), IP = ${IP}`);
+            erros.push(`ERRO: GPF de Código em Área Inválida (CS:??), Endereço físico: ${formatar_segmentos(fisico)}`);
         }
     }
 
-    if (SP > 0xFFF || SP < 0) {
-        const fisico = SS + SP;
-        if (fisico >= CS && fisico <= CS + 0xFFF) {
-            erros.push(`ERRO: GPF de Pilha em Código (SS:CS), SP = ${SP}`);
-        } else if (fisico >= DS && fisico <= DS + 0xFFF) {
-            erros.push(`ERRO: GPF de Pilha em Dados (SS:DS), SP = ${SP}`);
-        } else if (fisico >= ES && fisico <= ES + 0xFFF) {
-            erros.push(`ERRO: GPF de Pilha em Dados (SS:ES), SP = ${SP}`);
+    if (SP >= tamSS || SP < 0) {
+        const fisico = SS + tamSS - 1 - SP;
+        if (fisico >= CS && fisico <= limCS) {
+            erros.push(`ERRO: GPF de Pilha em Código (SS:CS), Endereço físico: ${formatar_segmentos(fisico)}`);
+        } else if (fisico >= DS && fisico <= limDS) {
+            erros.push(`ERRO: GPF de Pilha em Dados (SS:DS), Endereço físico: ${formatar_segmentos(fisico)}`);
+        } else if (fisico >= ES && fisico <= limES) {
+            erros.push(`ERRO: GPF de Pilha em Dados (SS:ES), Endereço físico: ${formatar_segmentos(fisico)}`);
         } else {
-            erros.push(`ERRO: GPF de Pilha em Área Inválida (SS:?️), SP = ${SP}`);
+            erros.push(`ERRO: GPF de Pilha em Área Inválida (SS:??), Endereço físico: ${formatar_segmentos(fisico)}`);
         }
     }
 
-    if (BP > 0xFFF || BP < 0) {
-        const fisico = SS + BP;
-        if (fisico >= CS && fisico <= CS + 0xFFF) {
-            erros.push(`ERRO: GPF de Pilha em Código (SS:CS), BP = ${BP}`);
-        } else if (fisico >= DS && fisico <= DS + 0xFFF) {
-            erros.push(`ERRO: GPF de Pilha em Dados (SS:DS), BP = ${BP}`);
-        } else if (fisico >= ES && fisico <= ES + 0xFFF) {
-            erros.push(`ERRO: GPF de Pilha em Dados (SS:ES), BP = ${BP}`);
+    if (BP >= tamSS || BP < 0) {
+        const fisico = SS + tamSS - 1 - BP;
+        if (fisico >= CS && fisico <= limCS) {
+            erros.push(`ERRO: GPF de Pilha em Código (SS:CS), Endereço físico: ${formatar_segmentos(fisico)}`);
+        } else if (fisico >= DS && fisico <= limDS) {
+            erros.push(`ERRO: GPF de Pilha em Dados (SS:DS), Endereço físico: ${formatar_segmentos(fisico)}`);
+        } else if (fisico >= ES && fisico <= limES) {
+            erros.push(`ERRO: GPF de Pilha em Dados (SS:ES), Endereço físico: ${formatar_segmentos(fisico)}`);
         } else {
-            erros.push(`ERRO: GPF de Pilha em Área Inválida (SS:?️), BP = ${BP}`);
+            erros.push(`ERRO: GPF de Pilha em Área Inválida (SS:??), Endereço físico: ${formatar_segmentos(fisico)}`);
         }
     }
 
-    if (SI > 0xFFF || SI < 0) {
+    if (SI >= tamDS || SI < 0) {
         const fisico = DS + SI;
-        if (fisico >= CS && fisico <= CS + 0xFFF) {
-            erros.push(`ERRO: GPF de Dados em Código (DS:CS), SI = ${SI}`);
-        } else if (fisico >= SS && fisico <= SS + 0xFFF) {
-            erros.push(`ERRO: GPF de Dados em Pilha (DS:SS), SI = ${SI}`);
-        } else if (fisico >= ES && fisico <= ES + 0xFFF) {
-            erros.push(`ERRO: GPF de Dados em Dados (DS:ES), SI = ${SI}`);
+        if (fisico >= CS && fisico <= limCS) {
+            erros.push(`ERRO: GPF de Dados em Código (DS:CS), Endereço físico: ${formatar_segmentos(fisico)}`);
+        } else if (fisico >= SS && fisico <= limSS) {
+            erros.push(`ERRO: GPF de Dados em Pilha (DS:SS), Endereço físico: ${formatar_segmentos(fisico)}`);
+        } else if (fisico >= ES && fisico <= limES) {
+            erros.push(`ERRO: GPF de Dados em Dados (DS:ES), Endereço físico: ${formatar_segmentos(fisico)}`);
         } else {
-            erros.push(`ERRO: GPF de Dados em Área Inválida (DS:?️), SI = ${SI}`);
+            erros.push(`ERRO: GPF de Dados em Área Inválida (DS:??), Endereço físico: ${formatar_segmentos(fisico)}`);
         }
     }
 
-    if (DI > 0xFFF || DI < 0) {
+    if (DI >= tamDS || DI < 0) {
         const fisico = DS + DI;
-        if (fisico >= CS && fisico <= CS + 0xFFF) {
-            erros.push(`ERRO: GPF de Dados em Código (DS:CS), DI = ${DI}`);
-        } else if (fisico >= SS && fisico <= SS + 0xFFF) {
-            erros.push(`ERRO: GPF de Dados em Pilha (DS:SS), DI = ${DI}`);
-        } else if (fisico >= ES && fisico <= ES + 0xFFF) {
-            erros.push(`ERRO: GPF de Dados em Dados (DS:ES), DI = ${DI}`);
+        if (fisico >= CS && fisico <= limCS) {
+            erros.push(`ERRO: GPF de Dados em Código (DS:CS), Endereço físico: ${formatar_segmentos(fisico)}`);
+        } else if (fisico >= SS && fisico <= limSS) {
+            erros.push(`ERRO: GPF de Dados em Pilha (DS:SS), Endereço físico: ${formatar_segmentos(fisico)}`);
+        } else if (fisico >= ES && fisico <= limES) {
+            erros.push(`ERRO: GPF de Dados em Dados (DS:ES), Endereço físico: ${formatar_segmentos(fisico)}`);
         } else {
-            erros.push(`ERRO: GPF de Dados em Área Inválida (DS:?️), DI = ${DI}`);
+            erros.push(`ERRO: GPF de Dados em Área Inválida (DS:??), Endereço físico: ${formatar_segmentos(fisico)}`);
         }
     }
 
